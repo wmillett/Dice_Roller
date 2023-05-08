@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include <string.h>
 
 
 int getRandomNumber(int min, int max) {
@@ -90,6 +90,7 @@ void    adrax(char**argv)
     int tdam = 0;
     if(argv[1][0] == 'a')
     {
+        printf("----------------------\n");
         printf("Adrax's attacks:\n");
         while (d8--)
         {
@@ -159,14 +160,89 @@ void    adrax(char**argv)
             }
             // printf("////\n");
         }
-    }
-    else
-    {
-        printf("test\n");
-    }
+    // else
+    // {
+    //     printf("test\n");
+    // }
     printf("Total damage: %i\n", tdam);
+    // int i = 0;
+    // printf("Potential damage with maneuvers: ");
+    // while(i < (d8 + d12))
+    // {
+    //     roll = getRandomNumber(1, 12);
+    //     printf("%i", roll);
+    //     i++;
+    // }
+    // printf("\n");
     printf("END OF ATTACKS\n");
+    printf("----------------------\n");
+    }
 }
+
+
+void adrax_fix(char**argv)
+{
+    int d8 = atoi(argv[2]);
+    int d12 = atoi(argv[3]);
+    const char *missed_by = argv[4];
+    int GWP = atoi(argv[5]);
+    int len_m = strlen(missed_by);
+    int i = 0;
+    int roll = 0;
+    int tdam = 0;
+
+    if (d12 + d8 != len_m)
+    {
+        printf("ERROR\nYour string says you have %i instead of %i attacks\n", len_m, d12 + d8);
+        exit(0);
+    }
+    printf("----------------------\n");
+    printf("Reroll attacks:\n");
+    while(i < len_m)
+    {   
+        if (i < d8)
+        {
+            roll = getRandomNumber(1, 12);
+            if (roll + 48 >= missed_by[i])
+            {
+                printf("Hit! ");
+                tdam += pdam(2);
+            }
+            else
+                printf("Miss...\n");
+        }
+        if (i >= d8)
+        {
+            roll = getRandomNumber(1,12);
+            if (roll + 48 >= missed_by[i])
+            {
+                if(GWP)
+                {
+                    printf("Hit! ");
+                    tdam += pdam(6);
+                }
+                else
+                {
+                    printf("Hit! ");
+                    tdam += pdam(5);
+                }
+            }
+            else
+                printf("Miss...\n");
+        }
+        i++;
+    }
+    printf("Total potential damage: %i\n", tdam);
+    printf("End of attack rerolls.\n");
+    printf("----------------------\n");
+
+
+
+}
+
+
+
+
 
 int main(int argc, char**argv)
 {
@@ -264,4 +340,8 @@ int main(int argc, char**argv)
     }
     else if (argc == 8 && (argv[1][0] == 'a'))
             adrax(argv);
+    else if (argc == 6 && (argv[1][0] == 'b'))
+            adrax_fix(argv);
+    else
+        printf("Oops, you made a mistake in your request.\n");
 }
